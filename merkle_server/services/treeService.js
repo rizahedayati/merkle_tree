@@ -10,6 +10,7 @@ async function initTree() {
       "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
       "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
       "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+
     ];
     const tree_size = await getTreeSize();
     if (tree_size == 0) {
@@ -46,7 +47,7 @@ async function insertNewTree(data) {
         (err) => console.log(err)
       );
     }
-    return tree.root.value;
+    return tree;
   } catch (err) {
     return { error: err };
   }
@@ -56,26 +57,33 @@ async function addAddress(newAddress) {
   try {
 
     const treeObj = await createTreeObj();
-    const dataSize = treeObj.data.length;
-    const oldRoot = treeObj.root.value;
     const old_data = treeObj.data;
-
-
-    const lastNodeProofs = treeObj.getProof(old_data[dataSize - 1]);
-    const nodeHash = getHash(newAddress);
 
     old_data.push(newAddress);
     const new_data = old_data;
-    const newRoot = await insertNewTree(new_data);
+    const newTree = await insertNewTree(new_data);
+
+    console.log(newTree,"NewTree");
+
+    const lastNodeIndex = newTree.data.length-1;
+    const lastNodeProofs = newTree.getProof(newAddress);
+    const newRoot = newTree.root.value;
+
+    if (lastNodeProofs.length == 0) {
+      return {
+        status: true,
+        data: [],
+        statusCode: 403,
+        message: `permission denied`,
+      };  
+    }
  
     return {
       status: true,
       data: {
-        size: dataSize,
-        proofs:lastNodeProofs,
-        old_root: oldRoot,
-        nodeHash: nodeHash,
-        new_oot: newRoot
+        lastNodeIndex,
+        lastNodeProofs,
+        newRoot
       },
       statusCode: 200,
     };
@@ -86,20 +94,31 @@ async function addAddress(newAddress) {
 
 async function mintNFT(signer) {
   try {
+
     const treeObj = await createTreeObj();
-    const proofs = treeObj.getProof(signer);
+
+    const proofs = await treeObj.getProof(signer);
+    const root = treeObj.root.value;
+    const position = treeObj.getDataPosition(signer);
+
+    console.log(position,"position");
+
 
     if (proofs.length == 0) {
       return {
         status: true,
-        data: result,
+        data: [],
         statusCode: 403,
         message: `permission denied`,
       };  
     }
     return {
         status: true,
-        data: proofs,
+        data: {
+          proofs,
+          root,
+          position
+        },
         statusCode: 200,
         message: `success`,
     };

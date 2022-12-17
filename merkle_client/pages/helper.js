@@ -1,14 +1,17 @@
-import keccak256 from "keccak256";
-import { Buffer } from 'buffer';
+
+import { ethers } from "ethers";
+
+
 
 // Hashes data and returns a hex string
-export function getHash(data) {
-	return bufferToHex(keccak256(data));
+export function getHashPair(a,b) {
+	return ethers.utils.solidityKeccak256(["bytes32", "bytes32"], [a, b])
+
 }
 
-function bufferToHex (value, withPrefix = true) {
-    return `${withPrefix ? '0x' : ''}${(value || Buffer.alloc(0)).toString(
-      'hex'
-    )}`
+export function getHash(data) {
+	return  ethers.utils.solidityKeccak256(["address"], [data]);
 }
+
+
 

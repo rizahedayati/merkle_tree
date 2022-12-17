@@ -1,4 +1,4 @@
-const getHash = require("./helper");
+const {getHash,getHashPair} = require("./helper");
 const MerkleNode = require("./merkleNode");
 
 class MerkleTree {
@@ -35,12 +35,12 @@ class MerkleTree {
     for (let i = 0; i < length; i += 2) {
       const currentItem = arr[i];
       if (i + 1 >= length) {
-        node = new MerkleNode(currentItem.value, currentItem, null);
+        node = new MerkleNode(getHashPair(currentItem.value,currentItem.value), currentItem, null);
         list.push(node);
         break;
       }
       const nextItem = arr[i + 1];
-      let value = currentItem.value + nextItem.value;
+      let value = getHashPair(currentItem.value , nextItem.value);
       node = new MerkleNode(value, currentItem, nextItem);
       list.push(node);
     }
@@ -50,7 +50,7 @@ class MerkleTree {
   }
 
   createLeafNodes(data) {
-    this.leafNodes = data.map((item) => new MerkleNode(item));
+    this.leafNodes = data.map((item) => new MerkleNode(getHash(item)));
   }
 
   getProof(data) {
@@ -68,18 +68,18 @@ class MerkleTree {
         if (position % 2 == 0 && position != currentTreeLength - 1) {
           neighbour = this.tree[i][position + 1];
           position = Math.floor(position / 2);
-          nodeValue = getHash(nodeValue + neighbour.value);
-          proofs.unshift(neighbour.value);
+          nodeValue = getHashPair(nodeValue ,neighbour.value);
+          proofs.push(neighbour.value);
         } else if (position % 2 == 0 && position == currentTreeLength - 1) {
           neighbour = this.tree[i][position];
           position = Math.floor(position / 2);
-          nodeValue = getHash(neighbour.value);
-          proofs.unshift(neighbour.value);
+          nodeValue = getHashPair(neighbour.value,neighbour.value);
+          proofs.push(neighbour.value);
         } else {
           neighbour = this.tree[i][position - 1];
           position = Math.floor(position / 2);
-          nodeValue = getHash(neighbour.value + nodeValue);
-          proofs.unshift(neighbour.value);
+          nodeValue = getHashPair(neighbour.value , nodeValue);
+          proofs.push(neighbour.value);
         }
       }
       return nodeValue == this.root.value ? proofs : [];
@@ -103,15 +103,15 @@ class MerkleTree {
         if (position % 2 == 0 && position != currentTreeLength - 1) {
           neighbour = this.tree[i][position + 1];
           position = Math.floor(position / 2);
-          nodeValue = getHash(nodeValue + neighbour.value);
+          nodeValue = getHashPair(nodeValue , neighbour.value);
         } else if (position % 2 == 0 && position == currentTreeLength - 1) {
           neighbour = this.tree[i][position];
           position = Math.floor(position / 2);
-          nodeValue = getHash(neighbour.value);
+          nodeValue = getHashPair(neighbour.value,neighbour.value);
         } else {
           neighbour = this.tree[i][position - 1];
           position = Math.floor(position / 2);
-          nodeValue = getHash(neighbour.value + nodeValue);
+          nodeValue = getHashPair(neighbour.value , nodeValue);
         }
       }
       return nodeValue == this.root.value ? true : false;
@@ -130,46 +130,7 @@ class MerkleTree {
     this.leafNodes = [];
     this.parentNodes = [];
     this.tree = [];
-
     this.createTree(this.data);
-
-    /**
-   * add new node to merkle tree - good idea
-    const treeLength = this.tree.length;
-    const _idx = this.tree.length - 1;
-    if (treeLength == 0) {
-      this.tree.unshift(new MerkleNode(newData));
-    }
-    let proof = this.getProof(this.data[this.data.length - 1]);
-    let proofId = 0;
-    let _nodeHash = getHash(newData);
-
-    while (treeLength > 1) {
-      let _peerIdx = (_idx / 2) * 2;
-      let _peerHash = "";
-      if (_peerIdx == _idx) {
-        _peerIdx += 1;
-      }
-      if (_peerIdx < treeLength) {
-        _peerHash = proof[proofId];
-        proofId += 1;
-      }
-
-      let _parentHash = "";
-      if (_peerIdx >= treeLength && _idx >= treeLength) {
-        // pass, _parentHash = bytes32(0)
-      } else if (_peerIdx > _idx) {
-        _parentHash = getHash(_nodeHash + _peerHash);
-      } else {
-        _parentHash = getHash(_peerHash + _nodeHash);
-      }
-
-      treeLength = (treeLength - 1) / 2 + 1;
-      _idx = _idx / 2;
-      _nodeHash = _parentHash;
-    }
-    return _nodeHash;
-   */
   }
 
   getTree() {
@@ -178,6 +139,12 @@ class MerkleTree {
 
   getDataSize() {
     this.data.length;
+  }
+
+  getDataPosition(data) {
+    return this.leafNodes.findIndex(
+      (item) => item.value == getHash(data)
+    );
   }
 
   setTree(_tree)  {

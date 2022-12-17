@@ -1,9 +1,15 @@
 const keccak256 = require("keccak256");
 const { Buffer } = require('buffer');
+const { ethers } =require("ethers");
 
 // Hashes data and returns a hex string
+function getHashPair(a,b) {
+	return ethers.utils.solidityKeccak256(["bytes32", "bytes32"], [a, b])
+
+}
+
 function getHash(data) {
-	return bufferToHex(keccak256(data));
+	return  ethers.utils.solidityKeccak256(["address"], [data]);
 }
 
 function bufferToHex (value, withPrefix = true) {
@@ -12,4 +18,7 @@ function bufferToHex (value, withPrefix = true) {
     )}`
 }
 
-module.exports = getHash;
+module.exports = {
+  getHash,
+  getHashPair
+};

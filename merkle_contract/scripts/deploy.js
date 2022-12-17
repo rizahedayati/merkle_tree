@@ -3,7 +3,7 @@ const fs = require('fs');
 
 async function main() {
   const Whitelist = await hre.ethers.getContractFactory("Whitelist");
-  const root = "0xd9c28690468f1f286339f64ca101da1933a4a48aff29100156ed7dada2d277c3";
+  const root = "0x5f2c89da171a5e62a50024db2e50cbfbb17348afdab4e2c27a406ae64617a36a";
   const whitelist = await Whitelist.deploy(root);
   await whitelist.deployed();
   console.log("whitelist deployed to:", whitelist.address);

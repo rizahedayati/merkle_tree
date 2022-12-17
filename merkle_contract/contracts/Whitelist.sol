@@ -3,7 +3,6 @@ pragma solidity ^0.8.6;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
 import "./MerkleTree.sol";
 
@@ -12,11 +11,10 @@ contract Whitelist is ERC721 {
     Counters.Counter private _tokenIds;
 
     bytes32 public merkleRoot;
-    address public immutable admin = 0x1c31DFc8471cc36125fdF0EA1eb56C47a6bC6eC0;
+    address public immutable admin = 0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199;
+    
 
-    constructor(bytes32 _merkleRoot)
-        ERC721("Spark world", "SPARK")
-    {
+    constructor(bytes32 _merkleRoot) ERC721("Spark world", "SPARK") {
         merkleRoot = _merkleRoot;
     }
 
@@ -25,10 +23,14 @@ contract Whitelist is ERC721 {
         _;
     }
 
-    modifier onlyWhiteList(bytes32[] memory _merkleProof) {
-       bytes32 node = keccak256(abi.encodePacked(msg.sender));
+    modifier onlyWhiteList(
+        uint256 _idx,
+        bytes32 _leafHash,
+        bytes32[] memory _proof,
+        bytes32 _root
+    ) {
         require(
-            MerkleProof.verify(_merkleProof, merkleRoot, node),
+            MerkleTree.verify(_idx, _leafHash, _proof, _root),
             "invalid proof"
         );
         _;
@@ -39,16 +41,16 @@ contract Whitelist is ERC721 {
         bytes32 _nodeHash,
         bytes32[] memory _proof
     ) external onlyAdmin {
-        merkleRoot = MerkleTree.calcRoot(_lastIndex,_nodeHash, _proof);
+        merkleRoot = MerkleTree.calcRoot(_lastIndex, _nodeHash, _proof);
     }
 
-    // function addAddress(
-    //     bytes32 _newRoot
-    // ) external onlyAdmin {
-    //     merkleRoot = _newRoot;
-    // }
 
-    function mint(bytes32[] memory _merkleProof) external onlyWhiteList(_merkleProof) {
+    function mint(
+        uint256 _idx,
+        bytes32 _leafHash,
+        bytes32[] memory _proof,
+        bytes32 _root
+    ) external onlyWhiteList(_idx, _leafHash, _proof, _root) {
         uint256 tokenId = _tokenIds.current();
         _mint(msg.sender, tokenId);
         _tokenIds.increment();

@@ -4,6 +4,8 @@ import { ethers } from "ethers";
 import { AccountContext } from "../context";
 import axios from "axios";
 import Whitelist from "./../artifacts/contracts/Whitelist.sol/Whitelist.json";
+import { getHash } from "./helper";
+import { localContractAddress,endpoint } from "../config";
 
 export default function Home(props) {
   const [address, setAddress] = useState("");
@@ -11,44 +13,51 @@ export default function Home(props) {
   
 
   async function addAddress() {
-    const account = await signer.getAddress();
-    const res = await axios.post(`http://localhost:8080/mint`, {
+    const account = await signer.getSigner().getAddress();
+    const res = await axios.post(`${endpoint}/add-address`, {
       data: {
         address: address,
       }
     });
 
-    console.log(res,"res");
+    let lastNodeIndex = res.data.data.lastNodeIndex;
+    let lastNodeProofs = res.data.data.lastNodeProofs;
+    let nodeHash = getHash(address);
 
-    let result = res.data.data;
+    console.log(localContractAddress);
+
     const contract = new ethers.Contract(
-      `0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512`,
+      localContractAddress,
       Whitelist.abi,
-      signer
+      signer.getSigner()  
     );
 
-    const transaction = await contract.addAddress(result.size,result.nodeHash,result.proofs);
+
+    const transaction = await contract.addAddress(lastNodeIndex,nodeHash,lastNodeProofs);
     await transaction.wait();
     
   }
   async function mint() {
-    const account = await signer.getAddress()
-    const res = await axios.post(`http://localhost:8080/mint`, {
+    const account = await signer.getSigner().getAddress()
+    const res = await axios.post(`${endpoint}/mint`, {
       data: {
         signer: account,
       }
     });
 
-    let proofs = res.data.data;
+    let proofs = res.data.data.proofs;
+    let root = res.data.data.root;
+    let position = res.data.data.position;
+
     const contract = new ethers.Contract(
-      `0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512`,
+      localContractAddress,
       Whitelist.abi,
-      signer
+      signer.getSigner()  
     );
 
-    const transaction = await contract.mint(proofs);
+    const transaction = await contract.mint(position,getHash(account),proofs,root);
     await transaction.wait();
-   
+
   }
 
   return (

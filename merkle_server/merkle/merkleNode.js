@@ -1,7 +1,7 @@
 const getHash = require("./helper");
 class MerkleNode {
   constructor(value, left = null, right = null) {
-    this.value = getHash(value);
+    this.value = value;
     this.left = left;
 
     this.right = right;

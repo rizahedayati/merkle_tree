@@ -36,9 +36,11 @@ function MyApp({ Component, pageProps }) {
       const web3Modal = await getWeb3Modal()
       const connection = await web3Modal.connect()
       const provider = new ethers.providers.Web3Provider(connection)
+
+
       const accounts = await provider.listAccounts();
       setAccount(accounts[0]);
-      setSigner(provider.getSigner());
+      setSigner(provider);
       console.log(provider.getSigner(),"provider.getSigner()");
     } catch (err) {
       console.log('error:', err)
