@@ -28,6 +28,7 @@ yarn-error.log*
 .vercel
 
 .env
+.log
 
 #Hardhat files
 cache

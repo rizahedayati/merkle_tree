@@ -4,28 +4,18 @@ import Link from 'next/link'
 import { css } from '@emotion/css'
 import { ethers } from 'ethers'
 import Web3Modal from 'web3modal'
-import WalletConnectProvider from '@walletconnect/web3-provider'
 import { AccountContext } from '../context.js'
-import { ownerAddress } from '../config'
 import 'easymde/dist/easymde.min.css'
 
 function MyApp({ Component, pageProps }) {
   /* create local state to save account information after signin */
   const [account, setAccount] = useState(null);
   const [signer,setSigner] = useState(null);
+
   /* web3Modal configuration for enabling wallet access */
   async function getWeb3Modal() {
     const web3Modal = new Web3Modal({
-      network: 'mainnet',
       cacheProvider: false,
-      providerOptions: {
-        walletconnect: {
-          package: WalletConnectProvider,
-          options: { 
-            infuraId: process.env.NEXT_PUBLIC_INFURA_ID
-          },
-        },
-      },
     })
     return web3Modal
   }
