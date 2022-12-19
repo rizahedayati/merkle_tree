@@ -46,12 +46,6 @@ cd merkle_contract
 service mongod start
 ```
 
-6. start mongo db service in your system
-
-```sh
-service mongod start
-```
-
 7. copy contract address from merkle_contract/config.js and paste in merkle_client/config.js
 
 8. copy artifacs directory from merkle_contract and paste in merkle_client
