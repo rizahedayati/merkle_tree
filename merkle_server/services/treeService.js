@@ -1,15 +1,14 @@
 const MerkleTree = require("./../merkle/merkleTree");
 const TreeModel = require("./../db/treeModel");
-const getHash = require("../merkle/helper");
 
 async function initTree() {
   try {
     const whiteList = [
-      "0xdb9B58A23CbAC3e21b3A0516C40958104E3f7119",
-      "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
-      "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
-      "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
-      "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "0x43f9758b033Cf299Bd51fCf2e912f3D9944324C2", //white1
+      "0xFAF6d3e3851b7FbB2FC0fD7969e56eBF558BBCe1", //white2
+      "0x465CcECE8E0179c6DA0C9Df2De16013Fe3379eb3", //white3
+      "0x68bF2493c10bb8CfA6e5Ad5C28a47e5ae3A96DD5", //white4
+      "0x9E1b43708432552787163eEeC7D45Aae86d295e1", //white5
 
     ];
     const tree_size = await getTreeSize();

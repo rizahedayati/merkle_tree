@@ -5,7 +5,7 @@ import { AccountContext } from "../context";
 import axios from "axios";
 import Whitelist from "./../artifacts/contracts/Whitelist.sol/Whitelist.json";
 import { getHash } from "./helper";
-import { localContractAddress,endpoint } from "../config";
+import { localContractAddress,contractGoerliAddress,endpoint } from "../config";
 
 export default function Home(props) {
   const [address, setAddress] = useState("");
@@ -24,10 +24,9 @@ export default function Home(props) {
     let lastNodeProofs = res.data.data.lastNodeProofs;
     let nodeHash = getHash(address);
 
-    console.log(localContractAddress);
 
     const contract = new ethers.Contract(
-      localContractAddress,
+      contractGoerliAddress,
       Whitelist.abi,
       signer.getSigner()  
     );
@@ -50,7 +49,7 @@ export default function Home(props) {
     let position = res.data.data.position;
 
     const contract = new ethers.Contract(
-      localContractAddress,
+      contractGoerliAddress,
       Whitelist.abi,
       signer.getSigner()  
     );

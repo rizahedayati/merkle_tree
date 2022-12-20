@@ -11,7 +11,7 @@ contract Whitelist is ERC721 {
     Counters.Counter private _tokenIds;
 
     bytes32 public merkleRoot;
-    address public immutable admin = 0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199;
+    address public immutable admin = 0x0689eCDA80fb986A451307827f05656a96c4Fb80;
     
 
     constructor(bytes32 _merkleRoot) ERC721("Spark world", "SPARK") {
